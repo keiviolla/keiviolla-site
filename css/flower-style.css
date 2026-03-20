@@ -220,12 +220,179 @@ body {
   transform: translateY(-3px);
 }
 
+.qr-btn {
+  bottom: 100px !important;
+}
+
+.pure-qr-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  width: fit-content;
+  max-width: 90vw;
+  margin: auto;
+}
+
+.pure-qr-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pure-qr-image {
+  max-height: 80vh; 
+  width: auto;   
+  max-width: 100%; 
+  
+  display: block;
+  object-fit: contain; 
+  
+  image-rendering: -webkit-optimize-contrast; 
+}
+
+.close-qr {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 35px;
+  height: 35px;
+  background: white;
+  color: black;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  z-index: 10;
+}
+
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  overflow: hidden;
+}
+
+#bgVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(15px) brightness(0.4);
+  transform: scale(1.1);
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: -1;
+}
+
+.night {
+  background: transparent !important;
+}
+
+.floating-btn {
+  position: fixed;
+  right: 30px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 1000;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+}
+
+.floating-btn.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.msg-btn { bottom: 30px; }
+.qr-btn { bottom: 100px; }
+
+.floating-btn:hover {
+  transform: scale(1.1) translateY(-5px);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.pure-qr-card {
+  position: relative;
+  background: rgba(20, 20, 20, 0.6);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  padding: 10px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: fit-content;
+  max-width: 80vw;
+  margin: auto;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.9);
+}
+
+.pure-qr-image {
+  max-height: 70vh;
+  width: auto;
+  max-width: 100%;
+  display: block;
+  border-radius: 16px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
+.close-qr {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  z-index: 100;
+}
+
 .modern-popup {
   position: fixed;
   inset: 0;
-  z-index: 10000; /* Pastikan di atas semua elemen bunga */
+  z-index: 10000; 
   background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(15px); /* Efek blur premium */
+  backdrop-filter: blur(15px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -258,7 +425,6 @@ body {
 
 #openBtn:hover { transform: scale(1.1); }
 
-/* Class untuk menghilangkan popup */
 .hide-popup {
   opacity: 0;
   visibility: hidden;

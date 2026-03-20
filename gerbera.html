@@ -6,11 +6,18 @@
   <link rel="stylesheet" href="css/flower-style.css">
 </head>
 <body class="not-loaded">
+  <div class="video-background">
+    <video autoplay muted loop playsinline id="bgVideo">
+      <source src="assets/kei/vid1.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+  </div>
+
   <div id="overlay" class="modern-popup">
   <div class="glass-card">
     <h2>Hai Keviolla!</h2>
     <p>Aku punya sesuatu buat kamu, kira-kiraa kamuu penasaran engga?</p>
-    <button id="openBtn">Aku penasaran 👉👈</button>
+    <button id="openBtn">IYAA</button>
   </div>
   </div>
   <div id="marquee" class="running-text">
@@ -19,16 +26,42 @@
   </div>
 
   <button id="msgBtn" class="floating-btn">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+      <circle cx="12" cy="13" r="4"></circle>
+    </svg>
   </button>
+
+  <button id="qrBtn" class="floating-btn qr-btn">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 7V5a2 2 0 0 1 2-2h2"></path>
+      <path d="M17 3h2a2 2 0 0 1 2 2v2"></path>
+      <path d="M21 17v2a2 2 0 0 1-2 2h-2"></path>
+      <path d="M7 21H5a2 2 0 0 1-2-2v-2"></path>
+      
+      <rect x="7" y="7" width="3" height="3"></rect>
+      <rect x="14" y="7" width="3" height="3"></rect>
+      <rect x="7" y="14" width="3" height="3"></rect>
+      <rect x="14" y="14" width="3" height="3"></rect>
+    </svg>
+  </button>
+
+  <div id="qrPopup" class="mini-popup-overlay">
+    <div class="glass-card pure-qr-card">
+      <div class="close-qr" onclick="closeQrPopup()">×</div>
+      <div class="pure-qr-container">
+        <img src="assets/qr.png" alt="QR Code" class="pure-qr-image">
+      </div>
+    </div>
+  </div>
 
   <div id="photoPopup" class="mini-popup-overlay">
     <div class="mini-card">
       <div class="icon-circle">📸</div>
-      <p>Aku juga buatin Digital Photobooth buat kitaa, kamu mau liatt?</p>
+      <p>Aku juga buatin Private Photobooth buat kitaa, kamu mau liatt?</p>
       <div class="mini-card-btns">
-        <button onclick="closePhotoPopup()" class="btn-later">Ora urus, emoh</button>
-        <a href="photobooth.html" class="btn-go">Mau bangett!</a>
+        <button onclick="closePhotoPopup()" class="btn-later">Nanti</button>
+        <a href="photobooth.html" class="btn-go">Boleh</a>
       </div>
     </div>
   </div>
