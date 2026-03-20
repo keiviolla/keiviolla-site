@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keimaa — The Eternal Chapter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@300;800&family=Space+Mono&display=swap');
+
+        :root {
+            --bg: #080808;
+            --paper: #fdfcf8;
+            --accent: #b5835a;
+            --cover: #111111;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .grain {
+            position: fixed; inset: 0;
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            opacity: 0.05; pointer-events: none; z-index: 1000;
+        }
+
+        .scene {
+            width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            perspective: 2500px;
+        }
+
+        .book {
+            position: relative;
+            width: 380px; height: 540px;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+        }
+
+        .book.open { transform: translateX(190px) rotateX(5deg) rotateY(-5deg); }
+
+        .bookmark {
+            position: absolute;
+            top: -15px;
+            right: 40px;
+            width: 25px;
+            height: 130px;
+            background: #d63031;
+            z-index: 5;
+            box-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 88%, 0% 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .page {
+            position: absolute;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            transform-origin: left;
+            transform-style: preserve-3d;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1), z-index 0.1s;
+        }
+
+        .page.flipped { transform: rotateY(-180deg); }
+
+        .face {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            background: var(--paper);
+            padding: 45px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: inset 3px 0 20px rgba(0,0,0,0.05);
+        }
+
+        .face-back {
+            transform: rotateY(180deg);
+            background: #f5f3eb;
+            border-right: 1px solid rgba(0,0,0,0.1);
+        }
+
+        .cover-skin { 
+            background: var(--cover); 
+            color: white; 
+            justify-content: center; 
+            align-items: center; 
+            border-radius: 0 5px 5px 0;
+            z-index: 20;
+        }
+
+        .serif { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.8rem; color: #1a1a1a; line-height: 1.3; }
+        .journal { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: #666; line-height: 1.7; margin-top: 15px; }
+        
+        .photo-frame {
+            width: 100%; height: 50%; background: white; padding: 10px 10px 35px 10px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: rotate(-1.5deg);
+            margin-bottom: 20px;
+        }
+        .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: sepia(0.2); }
+
+        .footer-note {
+            position: absolute; bottom: 35px; left: 45px; right: 45px;
+            font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
+            color: var(--accent); opacity: 0.6; text-align: center;
+            border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;
+        }
+
+        .face::after {
+            content: ''; position: absolute; left: 0; top: 0; width: 30px; height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.12), transparent);
+        }
+
+        #final-page .face-back { background: var(--cover); z-index: 20; }
+    </style>
+</head>
+<body>
+
+    <div class="grain"></div>
+
+    <div class="scene">
+        <div id="book" class="book">
+            <div id="main-bookmark" class="bookmark"></div>
+            
+            <div class="page">
+                <div class="face cover-skin">
+                    <h1 style="font-size: 3.5rem; font-weight: 800; letter-spacing: -2px;">KEIMAA<span style="color:var(--accent)">.</span></h1>
+                    <p style="font-size: 0.5rem; letter-spacing: 6px; opacity: 0.4; margin-top: 10px;">VOLUME 01</p>
+                </div>
+                <div class="face face-back">
+                    <h2 class="serif" style="margin-top: 30%;">The First Page.</h2>
+                    <p class="journal">Sometimes, the simplest things are the most meaningful. Like when we start talking :p</p>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="face">
+                    <div class="photo-frame">
+                        <img src="assets/kei/img1.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516589174184-c685266e430c?w=500'">
+                    </div>
+                    <p class="journal">
+                        Hi Keiviolla! did you know?<br><br>
+                        Sejak ada kamu, aku ngerasa kalo dunia aku pelan-pelan jadi lebih berwarna tau.. ternyata bener ya <u>"love should be fun"</u> HEHE.<br>
+                        Kadang aku tuh beneran ngerasa lagu <i><u>Best Part</u></i> itu kayak nyeritain kamu, gimana caranya kamu bikin semuanya terasa cukup dan lebihh bersyukur.<br><br>
+                        Makasih ya udah hadir di hidup aku.. mungkin itu hal kecil buat orang lain, tapi jujur itu beneran berarti banget buat aku. 
+                    </p>
+                </div>
+                <div class="face face-back">
+                    <h2 class="serif">"Do You Love Her?"</h2>
+                    <div style="width:100%; height:180px; background:#000; margin:15px 0; border-radius:4px; overflow:hidden;">
+                        <video loop playsinline muted style="width:100%; height:100%; object-fit:cover;">
+                            <source src="assets/kei/vid1.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <p class="journal">
+                        OFC, I LOVE HER SO MUCHHHH...<br><br>
+                        more than u know,<br>
+                        more than i ever thought i could love sm1,<br>
+                        more than words could ever hold…<br><br>
+                        more than the ocean loves its shore,<br>
+                        more than the sun loves the horizon,<br>
+                        more than the clouds love the sky..<br><br>
+                        like everything in this world is meant<br>
+                        to find its way back to her 💕💞
+                    </p>
+                </div>
+            </div>
+
+            <div class="page">
+                <div class="face">
+                    <h2 class="serif">Keiviolla Gallery</h2>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
+                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img1.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300'"></div>
+                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img7.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300'"></div>
+                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img5.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1516589174184-c685266e430c?w=300'"></div>
+                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img6.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=300'"></div>
+                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img2.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300'"></div>
+                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img3.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300'"></div>
+                    </div>
+
+                    <p class="journal" style="font-size: 0.59rem; line-height: 1.4; margin-top: 12px;">
+                        <span style="color: var(--accent); font-style: italic;">"The world really needs to know how lucky I am to have us. Everyone should know about our story."</span>
+                    </p>
+                </div>
+                <div class="face face-back">
+                    <div class="photo-frame" style="transform: rotate(2deg); height: 80%; width: 85%; margin: 0 auto; background: #fff;">
+                        <video loop playsinline muted autoplay style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.1);">
+                            <source src="assets/kei/vid2.mp4" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="footer-note" style="bottom: 20px;">Perspective</div>
+                </div>
+            </div>
+            <div class="page">
+                <div class="face">
+                    <h2 class="serif">Morning Thoughts</h2>
+                    <p class="journal">Pernah gasii kamuu sadar betapa berartinya kehadiranmu buat orang lain? buatku, kamu ituu rumah keduaku, tentu aja aku gamau rumah keduaku hilang... so pls sama akuu terus ya keii</p>
+                    <div style="margin-top:30px; height:1px; background:rgba(0,0,0,0.1);"></div>
+                    <p class="journal" style="font-style: italic;">"You are the poem I never knew how to write."</p>
+                    <div style="margin-top: 15px; border-radius: 12px; overflow: hidden;">
+                        <iframe 
+                            data-testid="embed-iframe"
+                            style="border-radius:12px"
+                            src="https://open.spotify.com/embed/playlist/0KzeTPTxiVX25OBjJfwAGB?utm_source=generator"
+                            width="100%"
+                            height="300"
+                            frameBorder="0"
+                            allowfullscreen=""
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                            loading="lazy">
+                        </iframe>
+                    </div>
+                </div>
+                <div class="face face-back">
+                    <h2 class="serif" style="margin-top: 40%; text-align:center;">
+                        Stay Kind & Keep studying. <br>
+                        <span style="font-size: 0.8rem; opacity: 0.8; display: block; margin-top: 10px;">You’re getting better every day!</span>
+                    </h2>
+                    <div class="footer-note">A Reminder</div>
+                </div>
+            </div>
+
+            <div class="page" id="pre-final">
+                <div class="face">
+                    <h2 class="serif" style="margin-top: 20%;">One More Thing...</h2>
+                    <p class="journal">Terima kasiii yaa sudaaa bacaaa sampaiii sinii. Aku cumaaa mauu bilang kaloo aku bangga samaa kamuu, entah tentang apapun ituu, so proudd of u keii.</p>
+                    <div style="text-align: center; margin-top: 40px;">
+                        <div style="font-size: 2.5rem; color: #d63031;">♥</div>
+                        <p style="font-size: 0.5rem; letter-spacing: 4px; margin-top: 15px; opacity: 0.6;">FROM BIMA TO KEIVIOLLA</p>
+                    </div>
+                </div>
+                <div class="face face-back">
+                    <h2 class="serif" style="margin-top: 35%; text-align: center;">Holdd onn...</h2>
+                    <p class="journal" style="text-align: center;">Sebelumm aku tutup buku ini, akuu juga mau nutup hubungan kitaa dan mulai chapter baru dengan cara memulaii hubungann baruu yang lebihh seriuss hehe, kamuu selalu mempertanyakann hubungan kita kann? disinii aku bakalan langsung to the point aja yaa, may i be your boyfriend kei? harusnya si mauu ya wle, aku tauu km pengen dikasi bunga gerbera kann? i saw ur repostt btw, aku pengen ngasii kamu langsung sebenernya, tapii kemarin katanya gabolee, but itsokayy, setelah buku ini nutup bakalan ada sesuatuu buat km...</p>
+                </div>
+            </div>
+
+            <div class="page" id="final-page">
+                <div class="face cover-skin">
+                    <h2 class="serif" style="color: white; font-size: 1.5rem;">Keiviolla & Bima.</h2>
+                    <div style="width: 30px; height: 1px; background: var(--accent); margin: 20px 0;"></div>
+                    <p style="font-size: 0.4rem; letter-spacing: 6px; opacity: 0.4;">SEE YOU IN THE NEXT CHAPTER</p>
+                </div>
+                <div class="face face-back"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <audio id="flipSoundEffect" preload="auto">
+        <source src="assets/sound/flip.mp3" type="audio/mpeg">
+    </audio>
+
+    <audio id="bgMusic" loop preload="auto">
+        <source src="assets/sound/lany.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const book = document.getElementById('book');
+        const pages = document.querySelectorAll('.page');
+        const flipSound = document.getElementById('flipSoundEffect');
+        const bgMusic = document.getElementById('bgMusic');
+        const bookmark = document.getElementById('main-bookmark');
+        let currentIdx = 0;
+        let lastTap = 0;
+        let isFinishing = false;
+        let musicStarted = false;
+
+        function startMusic() {
+            if (!musicStarted) {
+                bgMusic.volume = 0.5;
+                bgMusic.play().catch(e => console.log("Music blocked by browser"));
+                musicStarted = true;
+            }
+        }
+
+        function playSound() {
+            if (flipSound) {
+                flipSound.currentTime = 0;
+                flipSound.play().catch(e => console.error("Audio error:", e));
+            }
+        }
+
+        function updateZIndex() {
+            pages.forEach((page, index) => {
+                if (index < currentIdx) {
+                    page.style.zIndex = index;
+                } else {
+                    page.style.zIndex = pages.length - index;
+                }
+            });
+            
+            if (!isFinishing && currentIdx > 0 && currentIdx < pages.length) {
+                bookmark.style.opacity = "1";
+            } else {
+                bookmark.style.opacity = "0";
+            }
+        }
+
+        function startFinishingSequence() {
+            if (isFinishing) return;
+            isFinishing = true;
+            bookmark.style.opacity = "0";
+
+            setTimeout(() => {
+                let delay = 0;
+                for (let i = pages.length - 1; i >= 0; i--) {
+                    setTimeout(() => {
+                        currentIdx = i;
+                        pages[i].classList.remove('flipped');
+                        updateZIndex();
+                        playSound();
+                        if (i === 0) book.classList.remove('open');
+                    }, delay);
+                    delay += 250; 
+                }
+
+                setTimeout(() => {
+                    document.body.style.opacity = '0';
+                    setTimeout(() => {
+                        window.location.href = 'gerbera.html';
+                    }, 1500);
+                }, delay + 1000);
+            }, 2000);
+        }
+
+        function flipForward() {
+            if (currentIdx < pages.length && !isFinishing) {
+                startMusic();
+                if (currentIdx === 0) book.classList.add('open');
+                
+                pages[currentIdx].classList.add('flipped');
+
+                const currentAndNextPages = [pages[currentIdx], pages[currentIdx + 1]];
+                
+                currentAndNextPages.forEach(page => {
+                    if (page) {
+                        const videos = page.querySelectorAll('video');
+                        videos.forEach(v => {
+                            v.muted = true;
+                            v.play().catch(e => console.log("Video play dipending:", e));
+                        });
+                    }
+                });
+
+                currentIdx++;
+                updateZIndex();
+                playSound();
+
+                if (currentIdx === pages.length) {
+                    startFinishingSequence();
+                }
+            }
+        }
+
+        function flipBack() {
+            if (currentIdx > 0 && !isFinishing) {
+                currentIdx--;
+                pages[currentIdx].classList.remove('flipped');
+                updateZIndex();
+                if (currentIdx === 0) book.classList.remove('open');
+                playSound();
+            }
+        }
+
+        const mc = new Hammer(document.body);
+        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 10 });
+        mc.on("swipeleft", () => flipForward());
+        mc.on("swiperight", () => flipBack());
+
+        document.body.addEventListener('click', (e) => {
+            const now = Date.now();
+            if (now - lastTap < 300) {
+                if (e.clientX > window.innerWidth / 2) flipForward();
+                else flipBack();
+            } else if (currentIdx === 0) {
+                flipForward();
+            }
+            lastTap = now;
+        });
+
+        updateZIndex();
+    </script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEIMAA — Ultimate Photobooth v3.2</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+        :root {
+            --bg: #050608;
+            --surface: #111318;
+            --accent: #3e63dd;
+            --border: rgba(255, 255, 255, 0.06);
+            --text-muted: #71717a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: white;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* --- SIDEBAR LEFT --- */
+        .sidebar {
+            width: 320px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            z-index: 50;
+        }
+
+        .brand h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.4rem; letter-spacing: 4px; color: white; }
+        .brand span { color: var(--accent); }
+
+        .control-group { margin-top: 32px; }
+        .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 12px; display: block; font-weight: 800; }
+
+        .layout-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
+        .lay-btn {
+            background: #1a1d23; border: 1px solid var(--border); color: var(--text-muted);
+            padding: 10px 5px; border-radius: 8px; font-size: 0.6rem; cursor: pointer; transition: 0.2s;
+            font-weight: 600; text-align: center;
+        }
+        .lay-btn.active { border-color: var(--accent); color: white; background: rgba(62, 99, 221, 0.15); }
+
+        .frame-list { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .frame-item {
+            padding: 12px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 0.75rem; cursor: pointer; text-align: center; background: #1a1d23; transition: 0.2s;
+        }
+        .frame-item.active { border-color: white; background: #272a31; color: white; }
+
+        .btn-capture {
+            margin-top: auto; background: white; color: black; border: none;
+            padding: 18px; border-radius: 12px; font-weight: 800; cursor: pointer;
+            transition: 0.3s; font-size: 0.85rem; letter-spacing: 1px;
+        }
+        .btn-capture:hover { transform: scale(1.02); background: #f0f0f0; }
+
+        /* --- MAIN VIEWPORT --- */
+        .main-stage {
+            flex-grow: 1; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at 50% 50%, #161920 0%, #050608 100%);
+            position: relative; padding: 40px;
+        }
+
+        .cam-frame {
+            width: 100%; max-width: 800px; aspect-ratio: 4/3; background: #000;
+            border-radius: 32px; overflow: hidden; position: relative;
+            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.7); border: 1px solid var(--border);
+        }
+
+        #video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
+        .cam-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 5; transition: 0.4s; }
+
+        /* --- PREVIEW SIDEBAR --- */
+        .preview-sidebar {
+            width: 340px; background: var(--surface); border-left: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 32px 20px; align-items: center;
+        }
+
+        .preview-scroll {
+            width: 100%; height: 100%; overflow-y: auto; display: flex; 
+            justify-content: center; padding: 10px;
+        }
+
+        .strip-preview {
+            width: 220px; 
+            min-height: fit-content;
+            padding: 16px; 
+            display: grid; 
+            gap: 12px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5); 
+            transition: 0.4s;
+            height: fit-content;
+            margin-bottom: 20px;
+        }
+
+        /* Preview Border Themes */
+        .strip-preview.t-candy { border: 8px double #ff7eb9 !important; }
+        .strip-preview.t-minimal { border: 1px solid rgba(0,0,0,0.05); }
+
+        .l-strip { grid-template-columns: 1fr; }
+        .l-grid { grid-template-columns: 1fr 1fr; }
+        .l-poster { grid-template-columns: 1fr 1fr; }
+
+        .img-slot { 
+            width: 100%; 
+            aspect-ratio: 4/3; 
+            background: #e2e2e7; 
+            background-size: cover; 
+            border-radius: 1px; 
+            transition: 0.3s;
+        }
+        
+        .strip-footer {
+            grid-column: 1 / -1; 
+            text-align: center; 
+            padding: 15px 0 5px 0; 
+            margin-top: 5px;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .footer-logo { font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+
+        /* Effects */
+        #countdown {
+            position: absolute; font-size: 160px; font-weight: 800; z-index: 20;
+            color: white; pointer-events: none; text-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+        .flash { position: absolute; inset: 0; background: white; z-index: 100; opacity: 0; pointer-events: none; }
+        .flash.active { animation: flash-anim 0.4s ease-out; }
+        @keyframes flash-anim { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+        .dl-btn {
+            background: var(--accent); color: white; border: none;
+            padding: 16px; border-radius: 12px; cursor: pointer; width: 100%;
+            font-weight: 700; transition: 0.2s; margin-top: 10px;
+        }
+        .dl-btn:disabled { opacity: 0.15; cursor: not-allowed; }
+
+        /* Cam Overlays */
+        .t-minimal { border: 25px solid white; }
+        .t-dark { border: 25px solid #1a1d21; }
+        .t-candy { border: 25px solid #ff7eb9; border-style: double; }
+        .t-retro { border: 25px solid #f3e5ab; }
+    </style>
+</head>
+<body>
+
+    <div id="flash" class="flash"></div>
+
+    <aside class="sidebar">
+        <div class="brand"><h1>KEIMAA STUDIO<span>.</span></h1></div>
+        <div class="control-group">
+            <span class="label">Layout Style</span>
+            <div class="layout-grid">
+                <button class="lay-btn active" onclick="setLayout('strip', 4, this)">STRIP (4)</button>
+                <button class="lay-btn" onclick="setLayout('grid', 4, this)">GRID (2x2)</button>
+                <button class="lay-btn" onclick="setLayout('poster', 6, this)">POSTER (6)</button>
+            </div>
+        </div>
+        <div class="control-group">
+            <span class="label">Choose Theme</span>
+            <div class="frame-list">
+                <div class="frame-item active" onclick="setTheme('minimal', this)">Minimalist</div>
+                <div class="frame-item" onclick="setTheme('dark', this)">Deep Space</div>
+                <div class="frame-item" onclick="setTheme('candy', this)">Candy Cane</div>
+                <div class="frame-item" onclick="setTheme('retro', this)">Retro Cream</div>
+            </div>
+        </div>
+        <button id="start-btn" class="btn-capture">START</button>
+    </aside>
+
+    <main class="main-stage">
+        <div id="countdown"></div>
+        <div class="cam-frame">
+            <div id="cam-border" class="cam-overlay t-minimal"></div>
+            <video id="video" autoplay playsinline></video>
+        </div>
+    </main>
+
+    <aside class="preview-sidebar">
+        <span class="label">Preview</span>
+        <div class="preview-scroll">
+            <div id="preview-strip" class="strip-preview l-strip"></div>
+        </div>
+        <button id="dl-btn" class="dl-btn" disabled>EXPORT</button>
+    </aside>
+
+    <canvas id="export-canvas" style="display:none;"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const startBtn = document.getElementById('start-btn');
+        const dlBtn = document.getElementById('dl-btn');
+        const camBorder = document.getElementById('cam-border');
+        const previewStrip = document.getElementById('preview-strip');
+        const countdownEl = document.getElementById('countdown');
+        const flash = document.getElementById('flash');
+        
+        let photos = [];
+        let config = { layout: 'strip', count: 4, theme: 'minimal' };
+
+        const themes = {
+            minimal: { bg: '#ffffff', text: '#111111', border: false },
+            dark: { bg: '#1a1d21', text: '#ffffff', border: false },
+            candy: { bg: '#fff0f6', text: '#ff7eb9', border: true, borderColor: '#ff7eb9' },
+            retro: { bg: '#f3e5ab', text: '#5d4037', border: false }
+        };
+
+        async function init() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 960 } });
+                video.srcObject = stream;
+                renderSlots();
+            } catch (e) { alert("Camera access denied."); }
+        }
+
+        function setLayout(type, count, btn) {
+            config.layout = type;
+            config.count = count;
+            document.querySelectorAll('.lay-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            previewStrip.className = `strip-preview l-${type} t-${config.theme}`;
+            renderSlots();
+        }
+
+        function setTheme(theme, btn) {
+            config.theme = theme;
+            document.querySelectorAll('.frame-item').forEach(i => i.classList.remove('active'));
+            if(btn) btn.classList.add('active');
+            
+            camBorder.className = `cam-overlay t-${theme}`;
+            previewStrip.className = `strip-preview l-${config.layout} t-${theme}`;
+            
+            const active = themes[theme];
+            previewStrip.style.backgroundColor = active.bg;
+            const footer = previewStrip.querySelector('.strip-footer');
+            if(footer) footer.style.color = active.text;
+        }
+
+        function renderSlots() {
+            previewStrip.innerHTML = '';
+            for(let i=0; i < config.count; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'img-slot';
+                previewStrip.appendChild(slot);
+            }
+            const footer = document.createElement('div');
+            footer.className = 'strip-footer';
+            footer.innerHTML = `<div class="footer-logo">KEIMAA PHOTOBOOTH</div><div style="font-size:7px; margin-top:4px; opacity:0.6">${new Date().toDateString().toUpperCase()}</div>`;
+            previewStrip.appendChild(footer);
+            setTheme(config.theme, document.querySelector(`.frame-item.active`));
+        }
+
+        startBtn.addEventListener('click', async () => {
+            photos = [];
+            startBtn.disabled = true;
+            dlBtn.disabled = true;
+            const slots = document.querySelectorAll('.img-slot');
+            slots.forEach(s => s.style.backgroundImage = 'none');
+            
+            for (let i = 0; i < config.count; i++) {
+                for (let c = 3; c > 0; c--) {
+                    countdownEl.innerText = c;
+                    await new Promise(r => setTimeout(r, 800));
+                }
+                countdownEl.innerText = "";
+                flash.classList.add('active');
+                setTimeout(() => flash.classList.remove('active'), 150);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = 800; canvas.height = 600;
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0, 800, 600);
+                
+                const data = canvas.toDataURL('image/jpeg', 0.95);
+                photos.push(data);
+                slots[i].style.backgroundImage = `url(${data})`;
+                
+                await new Promise(r => setTimeout(r, 600));
+            }
+            startBtn.disabled = false;
+            dlBtn.disabled = false;
+        });
+
+        dlBtn.addEventListener('click', () => {
+            const canvas = document.getElementById('export-canvas');
+            const ctx = canvas.getContext('2d');
+            const imgW = 800; const imgH = 600;
+            const borderSize = 60; const footerH = 220;
+
+            if(config.layout === 'strip') {
+                canvas.width = imgW + (borderSize * 2);
+                canvas.height = (imgH * 4) + (borderSize * 5) + footerH;
+            } else if(config.layout === 'grid') {
+                canvas.width = (imgW * 2) + (borderSize * 3);
+                canvas.height = (imgH * 2) + (borderSize * 3) + footerH;
+            } else {
+                canvas.width = (imgW * 2) + (borderSize * 3);
+                canvas.height = (imgH * 3) + (borderSize * 4) + footerH;
+            }
+
+            const activeTheme = themes[config.theme];
+            ctx.fillStyle = activeTheme.bg;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // DRAW BORDER IF CANDY
+            if(activeTheme.border) {
+                ctx.strokeStyle = activeTheme.borderColor;
+                ctx.lineWidth = 15;
+                ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+                ctx.lineWidth = 5;
+                ctx.strokeRect(35, 35, canvas.width - 70, canvas.height - 70);
+            }
+
+            let loaded = 0;
+            photos.forEach((src, i) => {
+                const img = new Image();
+                img.onload = () => {
+                    let x, y;
+                    if(config.layout === 'strip') {
+                        x = borderSize; y = borderSize + (i * (imgH + borderSize));
+                    } else {
+                        x = borderSize + (i % 2) * (imgW + borderSize);
+                        y = borderSize + Math.floor(i / 2) * (imgH + borderSize);
+                    }
+                    ctx.drawImage(img, x, y, imgW, imgH);
+                    
+                    loaded++;
+                    if (loaded === config.count) {
+                        ctx.fillStyle = activeTheme.text;
+                        ctx.textAlign = "center";
+                        ctx.font = "bold 42px 'Space Grotesk'";
+                        ctx.fillText("KEIMAA PHOTOBOOTH", canvas.width/2, canvas.height - 110);
+                        ctx.font = "22px 'Plus Jakarta Sans'";
+                        ctx.globalAlpha = 0.4;
+                        ctx.fillText(new Date().toDateString().toUpperCase(), canvas.width/2, canvas.height - 65);
+                        
+                        const link = document.createElement('a');
+                        link.download = `KEIMAA-${Date.now()}.png`;
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                        ctx.globalAlpha = 1.0;
+                    }
+                };
+                img.src = src;
+            });
+        });
+
+        init();
+    </script>
+</body>
+</html>
