@@ -204,6 +204,7 @@
         const previewStrip = document.getElementById('preview-strip');
         const countdownEl = document.getElementById('countdown');
         const flash = document.getElementById('flash');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         
         let photos = [];
         let config = { layout: 'strip', count: 4, theme: 'minimal' };
@@ -221,6 +222,63 @@
                 video.srcObject = stream;
                 renderSlots();
             } catch (e) { alert("Camera access denied."); }
+        }
+
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+
+            if (type === 'beep') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } 
+            
+            else if (type === 'shutter') {
+                // 1. Komponen Mekanik (White Noise)
+                const bufferSize = audioCtx.sampleRate * 0.15;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                // Filter agar suara tidak terlalu cempreng (biar lebih "solid")
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = "lowpass";
+                filter.frequency.setValueAtTime(3000, audioCtx.currentTime);
+
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.5, audioCtx.currentTime); // Volume lebih kencang
+                noiseGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+
+                // 2. Komponen Klik Cermin (Oscillator Rendah)
+                const click = audioCtx.createOscillator();
+                const clickGain = audioCtx.createGain();
+                click.type = 'triangle'; 
+                click.frequency.setValueAtTime(150, audioCtx.currentTime);
+                clickGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                clickGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
+
+                // Hubungkan semua
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+                
+                click.connect(clickGain);
+                clickGain.connect(audioCtx.destination);
+
+                noise.start();
+                click.start();
+                click.stop(audioCtx.currentTime + 0.05);
+            }
         }
 
         function setLayout(type, count, btn) {
@@ -270,9 +328,11 @@
             for (let i = 0; i < config.count; i++) {
                 for (let c = 3; c > 0; c--) {
                     countdownEl.innerText = c;
+                    playSound('beep');
                     await new Promise(r => setTimeout(r, 800));
                 }
                 countdownEl.innerText = "";
+                playSound('shutter');
                 flash.classList.add('active');
                 setTimeout(() => flash.classList.remove('active'), 150);
 

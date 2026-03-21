@@ -2,396 +2,396 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Keimaa — New Chapter</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Keiviolla Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;700;800&family=Syncopate:wght@400;700&family=Instrument+Serif:ital@0;1&family=Ms+Madi&family=Inter:wght@100;200;400&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500&family=Plus+Jakarta+Sans:wght@300;800&family=Space+Mono&display=swap');
-
         :root {
-            --bg: #080808;
-            --paper: #fdfcf8;
-            --accent: #b5835a;
-            --cover: #111111;
+            --accent: #ff85a2;
+            --accent-glow: rgba(255, 133, 162, 0.5);
+            --bg: #020202;
+            --card: rgba(15, 15, 15, 0.7);
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+            --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-        body {
-            background-color: var(--bg);
+        html { scroll-behavior: smooth; }
+        
+        body { 
+            background-color: var(--bg); 
+            color: var(--text); 
             font-family: 'Plus Jakarta Sans', sans-serif;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            transition: opacity 1.5s ease-in-out;
+            overflow-x: hidden;
+            line-height: 1.6;
+            cursor: none;
         }
 
-        .grain {
-            position: fixed; inset: 0;
-            background: url('https://www.transparenttextures.com/patterns/stardust.png');
-            opacity: 0.05; pointer-events: none; z-index: 1000;
-        }
-
-        .scene {
-            width: 100%; height: 100%;
-            display: flex; justify-content: center; align-items: center;
-            perspective: 2500px;
-        }
-
-        .book {
-            position: relative;
-            width: 380px; height: 540px;
-            transform-style: preserve-3d;
-            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
-        }
-
-        .book.open { transform: translateX(190px) rotateX(5deg) rotateY(-5deg); }
-
-        .bookmark {
-            position: absolute;
-            top: -15px;
-            right: 40px;
-            width: 25px;
-            height: 130px;
-            background: #d63031;
-            z-index: 5;
-            box-shadow: 3px 3px 6px rgba(0,0,0,0.3);
-            clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 50% 88%, 0% 100%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+        /* Particles - Heart Shape / Soft Bokeh */
+        #canvas-particles {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
             pointer-events: none;
+            opacity: 0.8;
         }
 
-        .page {
-            position: absolute;
-            width: 100%; height: 100%;
-            top: 0; left: 0;
-            transform-origin: left;
-            transform-style: preserve-3d;
-            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1), z-index 0.1s;
-        }
+        /* Premium Cursor */
+        #cursor { width: 6px; height: 6px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 10001; mix-blend-mode: difference; }
+        #cursor-f { width: 35px; height: 35px; border: 1px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 10000; transition: transform 0.15s var(--ease-out); }
 
-        .page.flipped { transform: rotateY(-180deg); }
-
-        .face {
-            position: absolute;
-            width: 100%; height: 100%;
-            backface-visibility: hidden;
-            background: var(--paper);
-            padding: 45px;
+        /* Smooth Entry Gate */
+        #gate {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 20000;
             display: flex;
             flex-direction: column;
-            box-shadow: inset 3px 0 20px rgba(0,0,0,0.05);
+            justify-content: center;
+            align-items: center;
+            transition: 1.8s var(--ease-in-out);
+        }
+        #gate.open { transform: translateY(-100%) scale(1.1); filter: blur(20px); }
+        #gate .heart { 
+            font-size: 2.5rem; 
+            color: var(--accent); 
+            animation: pulse 2s infinite; 
+            filter: drop-shadow(0 0 10px var(--accent-glow));
+        }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 0.5; } }
+
+        /* Interactive Navbar */
+        nav {
+            position: fixed;
+            top: 25px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            display: flex;
+            gap: clamp(15px, 4vw, 35px);
+            padding: 14px 35px;
+            background: rgba(10, 10, 10, 0.4);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 100px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            width: fit-content;
+            max-width: 90vw;
+        }
+        nav a { 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            font-family: 'Syncopate'; 
+            font-size: 0.55rem; 
+            letter-spacing: 2px; 
+            transition: 0.4s;
+            position: relative;
+        }
+        nav a:hover, nav a.active { color: var(--accent); opacity: 1; }
+        nav a.active::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; 
+            transform: translateX(-50%); width: 4px; height: 4px; 
+            background: var(--accent); border-radius: 50%;
         }
 
-        .face-back {
-            transform: rotateY(180deg);
-            background: #f5f3eb;
-            border-right: 1px solid rgba(0,0,0,0.1);
+        /* Hero Header */
+        header {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 8%;
+            position: relative;
+            z-index: 10;
         }
-
-        .cover-skin { 
-            background: var(--cover); 
-            color: white; 
-            justify-content: center; 
-            align-items: center; 
-            border-radius: 0 5px 5px 0;
-            z-index: 20;
-        }
-
-        .serif { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.8rem; color: #1a1a1a; line-height: 1.3; }
-        .journal { font-family: 'Space Mono', monospace; font-size: 0.65rem; color: #666; line-height: 1.7; margin-top: 15px; }
+        .reveal-text { overflow: hidden; }
+        header .title-top { font-family: 'Syncopate'; font-size: clamp(2rem, 8vw, 5rem); font-weight: 700; letter-spacing: -2px; margin-bottom: -10px; animation: slideUp 1.2s var(--ease-out); }
+        header .title-bottom { font-family: 'Ms Madi', cursive; font-size: clamp(4rem, 12vw, 8rem); color: var(--accent); animation: slideUp 1.5s var(--ease-out); text-shadow: 0 0 25px rgba(255,133,162,0.2); }
         
-        .photo-frame {
-            width: 100%; height: 50%; background: white; padding: 10px 10px 35px 10px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1); transform: rotate(-1.5deg);
-            margin-bottom: 20px;
-        }
-        .photo-frame img { width: 100%; height: 100%; object-fit: cover; filter: sepia(0.2); }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        .footer-note {
-            position: absolute; bottom: 35px; left: 45px; right: 45px;
-            font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
-            color: var(--accent); opacity: 0.6; text-align: center;
-            border-top: 1px solid rgba(0,0,0,0.06); padding-top: 15px;
+        /* Bento Grid: True Responsive (S22U / iPhone / Desktop) */
+        .section-header { 
+            padding: 100px 10% 30px; 
+            display: flex; 
+            align-items: center; 
+            gap: 20px;
+            font-family: 'Syncopate';
+            font-size: 0.6rem;
+            letter-spacing: 5px;
+            color: var(--accent);
+            opacity: 0.6;
+        }
+        .section-header .line { flex-grow: 1; height: 1px; background: linear-gradient(to right, var(--accent), transparent); }
+
+        .bento {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-auto-rows: minmax(300px, auto);
+            gap: 20px;
+            padding: 0 10% 100px;
+            z-index: 10;
+            position: relative;
         }
 
-        .face::after {
-            content: ''; position: absolute; left: 0; top: 0; width: 30px; height: 100%;
-            background: linear-gradient(to right, rgba(0,0,0,0.12), transparent);
+        .tile {
+            position: relative;
+            background: var(--card);
+            border-radius: 35px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.04);
+            transition: transform 0.8s var(--ease-out), border-color 0.5s;
+            opacity: 0; transform: translateY(30px); /* For Scroll Reveal */
+        }
+        .tile.reveal { opacity: 1; transform: translateY(0); }
+        .tile:hover { transform: scale(0.98); border-color: var(--accent); box-shadow: 0 15px 45px rgba(255,133,162,0.1); }
+        
+        .tile img, .tile video { width: 100%; height: 100%; object-fit: cover; transition: 1.5s var(--ease-out); }
+        .tile:hover img, .tile:hover video { transform: scale(1.1); }
+
+        /* Grid Logic */
+        .big { grid-column: span 2; grid-row: span 2; }
+        .wide { grid-column: span 2; }
+        .tall { grid-row: span 2; }
+        .square { aspect-ratio: 1/1; }
+
+        /* Glass Text Cards */
+        .text-tile {
+            padding: clamp(30px, 5vw, 60px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(145deg, rgba(20,20,20,0.8), rgba(5,5,5,0.8));
+            backdrop-filter: blur(10px);
+        }
+        .text-tile h2 { font-family: 'Instrument Serif'; font-size: clamp(2rem, 5vw, 3.5rem); color: var(--accent); margin-bottom: 20px; line-height: 1; }
+        .text-tile p { font-size: 1.05rem; color: var(--text-dim); font-weight: 200; line-height: 1.8; }
+
+        /* Audio Control */
+        #audio-toggle { 
+            position: fixed; bottom: 30px; left: 30px; z-index: 1000; 
+            width: 50px; height: 50px; border-radius: 50%; 
+            background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; transition: 0.3s;
+        }
+        #audio-toggle:hover { background: var(--accent); transform: scale(1.1); }
+
+        /* Section Specific: Letter */
+        .letter-wrap {
+            padding: 150px 10%;
+            text-align: center;
+            background: radial-gradient(circle at 50% 100%, rgba(255,133,162,0.1), transparent 70%);
+        }
+        .letter-wrap h2 { font-family: 'Instrument Serif'; font-size: clamp(3rem, 10vw, 6rem); margin-bottom: 40px; font-weight: 400; }
+        .cta-btn {
+            display: inline-flex; align-items: center; gap: 15px;
+            padding: 25px 60px; background: #fff; color: #000;
+            text-decoration: none; border-radius: 100px;
+            font-family: 'Syncopate'; font-weight: 800; font-size: 0.8rem;
+            transition: 0.6s var(--ease-out);
+        }
+        .cta-btn:hover { background: var(--accent); color: #fff; transform: translateY(-10px) rotate(-1deg); box-shadow: 0 25px 50px rgba(255,133,162,0.3); }
+
+        /* Responsive Mobile Tweak */
+        @media (max-width: 1024px) {
+            .bento { grid-template-columns: repeat(2, 1fr); padding: 0 5% 50px; gap: 15px; }
+            header { padding: 0 5%; }
         }
 
-        #final-page .face-back { background: var(--cover); z-index: 20; }
+        @media (max-width: 768px) {
+            body { cursor: auto; }
+            #cursor, #cursor-f { display: none; }
+            .bento { grid-template-columns: 1fr; grid-auto-rows: auto; }
+            .big, .wide, .tall { grid-column: span 1; grid-row: span 1; }
+            .tile { height: clamp(350px, 80vh, 500px); border-radius: 30px; }
+            nav { bottom: 30px; top: auto; width: 92%; }
+            #audio-toggle { bottom: 100px; left: 20px; }
+            .text-tile { height: auto; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="grain"></div>
+    <div id="cursor"></div>
+    <div id="cursor-f"></div>
+    <canvas id="canvas-particles"></canvas>
 
-    <div class="scene">
-        <div id="book" class="book">
-            <div id="main-bookmark" class="bookmark"></div>
-            
-            <div class="page">
-                <div class="face cover-skin">
-                    <h1 style="font-size: 3.5rem; font-weight: 800; letter-spacing: -2px;">KEIMAA<span style="color:var(--accent)">.</span></h1>
-                    <p style="font-size: 0.5rem; letter-spacing: 6px; opacity: 0.4; margin-top: 10px;">KEIVIOLLA & BIMA — CHAPTER 0</p>
-                </div>
-                <div class="face face-back">
-                    <h2 class="serif" style="margin-top: 30%;"><u>The First Page.</u></h2>
-                    <p class="journal">Sometimes, the simplest things are the most meaningful. Like when we start talking :p</p>
-                </div>
-            </div>
-
-            <div class="page">
-                <div class="face">
-                    <div class="photo-frame">
-                        <img src="assets/kei/img1.jpeg" onerror="this.src='https://images.unsplash.com/photo-1516589174184-c685266e430c?w=500'">
-                    </div>
-                    <p class="journal" style="font-size:0.63rem; margin-top:10px;">
-                        Hi Keiviolla! did you know?<br><br>
-                        Sejak ada kamu, aku ngerasa kalo dunia aku pelan-pelan jadi lebih berwarna tau.. ternyata bener ya <u>"love should be fun"</u> HEHE.<br>
-                        Kadang aku tuh beneran ngerasa lagu <i><u>Best Part</u></i> itu kayak nyeritain kamu, gimana caranya kamu bikin semuanya terasa lebihh cukup dan lebihh bersyukur.<br><br>
-                        Makasih ya udah hadir di hidup aku.. mungkin itu hal kecil buat orang lain, tapi jujur itu beneran berarti banget buat aku. 
-                    </p>
-                </div>
-                <div class="face face-back">
-                    <h2 class="serif"><u>"Do You Love Her?"</u></h2>
-                    <div style="width:100%; height:180px; background:#000; margin:15px 0; border-radius:4px; overflow:hidden;">
-                        <video loop playsinline muted style="width:100%; height:100%; object-fit:cover;">
-                            <source src="assets/kei/vid1.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <p class="journal">
-                        OFC, I LOVE HER SO MUCHHHH...<br><br>
-                        more than u know,<br>
-                        more than i ever thought i could love sm1,<br>
-                        more than words could ever hold…<br><br>
-                        more than the ocean loves its shore,<br>
-                        more than the sun loves the horizon,<br>
-                        more than the clouds love the sky..<br><br>
-                        like everything in this world is meant<br>
-                        to find its way back to her 💕💞
-                    </p>
-                </div>
-            </div>
-
-            <div class="page">
-                <div class="face">
-                    <h2 class="serif"><u>Keiviolla Gallery</u></h2>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:15px;">
-                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img1.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300'"></div>
-                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img7.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300'"></div>
-                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img5.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1516589174184-c685266e430c?w=300'"></div>
-                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img6.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=300'"></div>
-                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img2.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=300'"></div>
-                        <div style="height:100px; background:#eee; overflow:hidden;"><img src="assets/kei/img3.jpeg" style="width:100%; height:100%; object-fit:cover;" onerror="this.src='https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=300'"></div>
-                    </div>
-
-                    <p class="journal" style="font-size: 0.59rem; line-height: 1.4; margin-top: 12px;">
-                        <span style="color: var(--accent); font-style: italic;">"The world really needs to know how lucky I am to have us. Everyone should know about our story."</span>
-                    </p>
-                </div>
-                <div class="face face-back">
-                    <div class="photo-frame" style="transform: rotate(2deg); height: 80%; width: 85%; margin: 0 auto; background: #fff;">
-                        <video loop playsinline muted autoplay style="width: 100%; height: 100%; object-fit: cover; filter: sepia(0.1);">
-                            <source src="assets/kei/vid2.mp4" type="video/mp4">
-                        </video>
-                    </div>
-                    <div class="footer-note" style="bottom: 20px;">Keiviolla</div>
-                </div>
-            </div>
-            <div class="page">
-                <div class="face">
-                    <h2 class="serif"><u>Soft Thoughts</u></h2>
-                    <p class="journal">Pernah gasii kamuu sadar betapa berartinya kehadiranmu buat orang lain? buatku, kamu ituu rumah keduaku, tentu aja aku gamau rumah keduaku hilang... so pls sama akuu terus ya keii</p>
-                    <div style="margin-top:30px; height:1px; background:rgba(0,0,0,0.1);"></div>
-                    <p class="journal" style="font-style: italic;">"You are the poem I never knew how to write."</p>
-                    <div style="margin-top: 15px; border-radius: 12px; overflow: hidden;">
-                        <iframe 
-                            data-testid="embed-iframe"
-                            style="border-radius:12px"
-                            src="https://open.spotify.com/embed/playlist/0KzeTPTxiVX25OBjJfwAGB?utm_source=generator"
-                            width="100%"
-                            height="300"
-                            frameBorder="0"
-                            allowfullscreen=""
-                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                </div>
-                <div class="face face-back">
-                    <h2 class="serif" style="margin-top: 40%; text-align:center;">
-                        <u>Stay Kind & Keep studying.</u><br>
-                        <span style="font-size: 0.8rem; opacity: 0.86; display: block; margin-top: 10px;">You’re getting better every day! Semangat belajarnya!</span>
-                    </h2>
-                    <div class="footer-note">A Reminder</div>
-                </div>
-            </div>
-
-            <div class="page" id="pre-final">
-                <div class="face">
-                    <h2 class="serif" style="margin-top: 20%;"><u>One More Thing...</u></h2>
-                    <p class="journal">Terima kasiii yaa sudaaa bacaaa sampaiii sinii. Aku cumaaa mauu bilang kaloo aku bangga samaa kamuu, entah tentang apapun ituu, so proudd of u keii.</p>
-                    <div style="text-align: center; margin-top: 40px;">
-                        <div style="font-size: 2.5rem; color: #d63031;">♥</div>
-                        <p style="font-size: 0.5rem; letter-spacing: 4px; margin-top: 15px; opacity: 0.6;">FROM BIMA TO KEIVIOLLA</p>
-                    </div>
-                </div>
-                <div class="face face-back">
-                    <h2 class="serif" style="margin-top: 35%; text-align: center;">Holdd Onn...</h2>
-                    <p class="journal" style="text-align: center;">Sebelumm aku tutup buku ini, akuu juga mau nutup hubungan kitaa dan mulai chapter baru dengan cara memulaii hubungann baruu yang lebihh seriuss hehe, kamuu selalu mempertanyakann hubungan kita kann? disinii aku bakalan langsung to the point aja yaa, <b></u>may i be your boyfriend kei?</u></b> harusnya si km pasti mauu yh WLE, aku tauu km pengen dikasi bunga gerbera kann? i saw ur repostt btw, aku pengen ngasii kamu langsung sebenernya, tapii kemarin katanya gabolee, but itsokayy, setelah buku ini nutup bakalan ada sesuatuu buat km...</p>
-                </div>
-            </div>
-
-            <div class="page" id="final-page">
-                <div class="face cover-skin">
-                    <h2 class="serif" style="color: white; font-size: 1.5rem;">Keiviolla & Bima.</h2>
-                    <div style="width: 30px; height: 1px; background: var(--accent); margin: 20px 0;"></div>
-                    <p style="font-size: 0.4rem; letter-spacing: 6px; opacity: 0.4;">SEE YOU IN THE NEXT CHAPTER</p>
-                </div>
-                <div class="face face-back"></div>
-            </div>
-
-        </div>
+    <div id="gate" onclick="initExperience()">
+        <div class="heart">♥</div>
+        <span>FOR KEIVIOLLA</span>
     </div>
 
-    <audio id="flipSoundEffect" preload="auto">
-        <source src="assets/sound/flip.mp3" type="audio/mpeg">
-    </audio>
+    <nav id="main-nav">
+        <a href="#home" class="active">HOME</a>
+        <a href="#identity">KEI</a>
+        <a href="#gallery">GALLERY</a>
+        <a href="#book">BOOK</a>
+    </nav>
 
-    <audio id="bgMusic" loop preload="auto">
-        <source src="assets/sound/sound.mp3" type="audio/mpeg">
-    </audio>
+    <div id="audio-toggle" onclick="toggleAudio()">♪</div>
+    <audio id="bg-msc" loop src="assets/sound/lany.mp3"></audio>
+
+    <header id="home">
+        <div class="reveal-text"><div class="title-top">DEAREST</div></div>
+        <div class="reveal-text"><div class="title-bottom">Keiviolla.</div></div>
+        <p class="sub" style="font-family: 'Inter'; font-weight: 100; opacity: 0.5; letter-spacing: 1px; margin-top: 20px;">Karena ingatan bisa aja memudar, maka aku abadikan kamu di sini.</p>
+    </header>
+
+    <div class="section-header" id="identity"><div class="line"></div> 01. WHO'S?</div>
+    <section class="bento">
+        <div class="tile big text-tile">
+            <h2>Siapa itu Kei?</h2>
+            <p><u>Blessings Keiviolla Zoeneona Van Mich Pezij.</u> Nama panjang yang selalu aku inget, biasa aku panggil Kei. Makasih ya udah jadi manusia yang paling sabar dan paling hobi prengat-prengut di hidup aku WKWK. Rasanya engga cukup kalau cuma disimpen di memori kepala aja, makanya aku bikinin website ini biar semua momen ini abadi dan aku bisa selalu inget momen ini.</p>
+        </div>
+        <div class="tile square">
+            <img src="assets/kei/img1.jpeg" alt="Kei Square">
+        </div>
+        <div class="tile">
+            <img src="assets/kei/img2.jpeg" alt="Kei Portrait">
+        </div>
+    </section>
+
+    <div class="section-header" id="gallery"><div class="line"></div> 02. KEIVIOLLA GALLERY</div>
+    <section class="bento">
+        <div class="tile wide">
+            <video autoplay muted loop playsinline src="assets/kei/vid1.mp4"></video>
+        </div>
+        <div class="tile">
+            <img src="assets/kei/img3.jpeg">
+        </div>
+        <div class="tile">
+            <img src="assets/kei/img4.jpeg">
+        </div>
+        <div class="tile tall">
+            <video autoplay muted loop playsinline src="assets/kei/vid2.mp4"></video>
+        </div>
+        <div class="tile big">
+            <img src="assets/kei/img5.jpeg">
+        </div>
+        <div class="tile tall">
+            <video autoplay muted loop playsinline src="assets/kei/vid3.mp4"></video>
+        </div>
+        <div class="tile wide">
+            <video autoplay muted loop playsinline src="assets/kei/vid4.mp4"></video>
+        </div>
+        <div class="tile">
+            <img src="assets/kei/img6.jpeg">
+        </div>
+        <div class="tile">
+            <img src="assets/kei/img7.jpeg">
+        </div>
+    </section>
+
+    <section class="letter-wrap" id="book">
+        <div class="section-header" style="padding: 0; justify-content: center; margin-bottom: 30px;"><div class="line" style="flex-grow:0; width: 50px;"></div> 03. DIGITAL BOOK</div>
+        <h2>Hi Keiviolla!<br><i style="color: var(--accent);">Did you know?</i></h2>
+        <p style="color: var(--text-dim); max-width: 600px; margin: 0 auto 50px; font-weight: 300; font-size: 1.1rem;">
+            Di balik ini masih ada tauuu kejutann lagii... yep buku digital yang isinya jauh lebih banyak cerita dan semua hal yang pengen aku sampaikan ke kamu. Coba dibuka ya, Kei?
+        </p>
+        <a href="book.html" class="cta-btn">BUKA SEKARANG!</a>
+    </section>
+
+    <footer style="padding: 80px 5%; text-align: center; font-family: 'Syncopate'; font-size: 0.5rem; letter-spacing: 6px; opacity: 0.3;">
+        KEIMAA — KEIVIOLLA & BIMA 
+    </footer>
 
     <script>
-        const book = document.getElementById('book');
-        const pages = document.querySelectorAll('.page');
-        const flipSound = document.getElementById('flipSoundEffect');
-        const bgMusic = document.getElementById('bgMusic');
-        const bookmark = document.getElementById('main-bookmark');
-        let currentIdx = 0;
-        let lastTap = 0;
-        let isFinishing = false;
-        let musicStarted = false;
+        const canvas = document.getElementById('canvas-particles');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
 
-        function startMusic() {
-            if (!musicStarted) {
-                bgMusic.volume = 0.5;
-                bgMusic.play().catch(e => console.log("Music blocked by browser"));
-                musicStarted = true;
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedY = Math.random() * 0.4 + 0.1;
+                this.opacity = Math.random() * 0.5;
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = `rgba(255, 133, 162, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
-        function playSound() {
-            if (flipSound) {
-                flipSound.currentTime = 0;
-                flipSound.play().catch(e => console.error("Audio error:", e));
-            }
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 80; i++) particles.push(new Particle());
+            animateParticles();
         }
 
-        function updateZIndex() {
-            pages.forEach((page, index) => {
-                if (index < currentIdx) {
-                    page.style.zIndex = index;
-                } else {
-                    page.style.zIndex = pages.length - index;
-                }
-            });
-            
-            if (!isFinishing && currentIdx > 0 && currentIdx < pages.length) {
-                bookmark.style.opacity = "1";
-            } else {
-                bookmark.style.opacity = "0";
-            }
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animateParticles);
         }
 
-        function startFinishingSequence() {
-            if (isFinishing) return;
-            isFinishing = true;
-            bookmark.style.opacity = "0";
-
+        const crsr = document.getElementById('cursor');
+        const crsrF = document.getElementById('cursor-f');
+        document.addEventListener('mousemove', e => {
+            crsr.style.left = e.clientX + 'px';
+            crsr.style.top = e.clientY + 'px';
             setTimeout(() => {
-                let delay = 0;
-                for (let i = pages.length - 1; i >= 0; i--) {
-                    setTimeout(() => {
-                        currentIdx = i;
-                        pages[i].classList.remove('flipped');
-                        updateZIndex();
-                        playSound();
-                        if (i === 0) book.classList.remove('open');
-                    }, delay);
-                    delay += 250; 
-                }
-
-                setTimeout(() => {
-                    document.body.style.opacity = '0';
-                    setTimeout(() => {
-                        window.location.href = 'gerbera.html';
-                    }, 1500);
-                }, delay + 1000);
-            }, 2000);
-        }
-
-        function flipForward() {
-            if (currentIdx < pages.length && !isFinishing) {
-                startMusic();
-                if (currentIdx === 0) book.classList.add('open');
-                
-                pages[currentIdx].classList.add('flipped');
-
-                const currentAndNextPages = [pages[currentIdx], pages[currentIdx + 1]];
-                
-                currentAndNextPages.forEach(page => {
-                    if (page) {
-                        const videos = page.querySelectorAll('video');
-                        videos.forEach(v => {
-                            v.muted = true;
-                            v.play().catch(e => console.log("Video play dipending:", e));
-                        });
-                    }
-                });
-
-                currentIdx++;
-                updateZIndex();
-                playSound();
-
-                if (currentIdx === pages.length) {
-                    startFinishingSequence();
-                }
-            }
-        }
-
-        function flipBack() {
-            if (currentIdx > 0 && !isFinishing) {
-                currentIdx--;
-                pages[currentIdx].classList.remove('flipped');
-                updateZIndex();
-                if (currentIdx === 0) book.classList.remove('open');
-                playSound();
-            }
-        }
-
-        const mc = new Hammer(document.body);
-        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 10 });
-        mc.on("swipeleft", () => flipForward());
-        mc.on("swiperight", () => flipBack());
-
-        document.body.addEventListener('click', (e) => {
-            const now = Date.now();
-            if (now - lastTap < 300) {
-                if (e.clientX > window.innerWidth / 2) flipForward();
-                else flipBack();
-            } else if (currentIdx === 0) {
-                flipForward();
-            }
-            lastTap = now;
+                crsrF.style.left = e.clientX - 17 + 'px';
+                crsrF.style.top = e.clientY - 17 + 'px';
+            }, 50);
         });
 
-        updateZIndex();
+        function initExperience() {
+            document.getElementById('gate').classList.add('open');
+            document.getElementById('bg-msc').play().catch(() => {});
+        }
+
+        function toggleAudio() {
+            const m = document.getElementById('bg-msc');
+            m.paused ? m.play() : m.pause();
+        }
+
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('reveal');
+                    const id = entry.target.getAttribute('id');
+                    if (id) {
+                        document.querySelectorAll('nav a').forEach(a => {
+                            a.classList.remove('active');
+                            if (a.getAttribute('href') === `#${id}`) a.classList.add('active');
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.tile, header, section, div.section-header').forEach(el => observer.observe(el));
+
+        window.addEventListener('scroll', () => {
+            document.querySelectorAll('.tile img, .tile video').forEach(el => {
+                const rect = el.parentElement.getBoundingClientRect();
+                const offset = (window.innerHeight - rect.top) * 0.05;
+                el.style.transform = `scale(1.2) translateY(${offset - 20}px)`;
+            });
+        });
+
+        window.addEventListener('resize', resize);
+        resize(); initParticles();
     </script>
 </body>
 </html>
